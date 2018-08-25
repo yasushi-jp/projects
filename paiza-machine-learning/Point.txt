@@ -1,0 +1,308 @@
+＃01:機械学習の概要を知ろう
+
+●このレッスンの概要
+・機械学習の概要を知ろう
+・PythonとJupyter Notebookを使ってみよう
+・問題と入出力データを考えよう
+・画像から特徴量を抽出しよう
+・scikit learnで学習と予測を行おう
+・特徴量に明度のヒストグラムを利用しよう
+
+●レッスンの目的と対象者
+・目的: 機械学習を行う手順を理解する
+・対象者: Python入門編を学習済みの人
+
+Python入門編: https://paiza.jp/works/python3/primer
+
+●機械学習に使うPythonライブラリ
+ライブラリ	概要
+Python	スクリプト形式のプログラミング言語
+Jupyter Notebook	Pythonの使いやすい実行環境
+Matplotlib	グラフ描画のライブラリ
+NumPy	数値計算ライブラリ
+Pandas	様々な形式のデータの入出力ライブラリ
+OpenCV	画像処理ライブラリ
+scikit-learn	機械学習ライブラリ
+
+＃02:PythonとJupyter Notebookを使ってみよう
+
+●paiza cloudは
+環境構築の必要なく,ブラウザでLinux環境を簡単に利用できるサービスです。
+https://paiza.cloud
+
+●Jupyter Notebookとは
+使いやすいPythonの実行ツールです。
+http://jupyter.org/
+
+●Numpyとは
+Pythonの数値計算ライブラリです。
+http://www.numpy.org/
+
+●Numpyでランダムな整数文字列を生成するには
+
+import numpy as np
+
+np.random.seed(シード値)
+y = np.random.randint(整数値の下限, 整数値の上限, 整数の個数)
+print(y)
+
+●Numpyでグラフを描画するには
+
+import matplotlib.pyplot as plt
+
+plt.plot(x軸の配列, y軸の配列)
+
+●Numpy配列
+Pythonはデータの並びを扱う標準の機能として「リスト」を備えています。
+ですが、機械学習などの数値計算では、データの並びをより便利に扱うことができるNumpy配列が広く利用されています。
+このレッスンでは、リストではなく、Numpy配列を利用します。
+
+＃03:問題と入出力データを考えよう 
+
+●機械学習で解く問題
+漫画『ぱいじょ！』の画像に、霧島さんが写っているかどうかを判定する。
+
+●ぱいじょとは
+ITエンジニアを目指す女子高生たちの学園ライフ4コマ漫画 ぱいじょ！（毎週月曜日更新！）
+https://paiza.jp/paijo
+
+●ぱいじょのキャラ
+名 前	特 徴
+霧島 京子（きりしま きょうこ）	赤いリボンが似合う高校生
+六村 リオ（ろくむら りお）	金髪で食いしん坊の高校生
+緑川 つばめ（みどりかわ つばめ）	黒髪で大人しい高校生
+黒田 先生（くろだ せんせい）	メガネが似合う先生
+猫 先生（ねこ せんせい）	猫
+
+●教師データとは
+正しい分類が何かの具体例を示すデータのこと。入力データに対して期待する答えが紐づけたもの。
+
+●今回の問題の教師データの例
+
+id,Kirishima
+0,1
+1,0
+2,1
+
+000の画像には霧島さんが写っていて、
+001の画像には霧島さんが写っていなくて、
+002の画像には霧島さんが写っている。
+
+●今回の問題の作成済みの教師データ
+y_classified.csv
+
+id,Kirishima,Rokumura,Midorikawa,Kuroda,Neko
+0,1,0,0,0,0
+1,0,1,1,0,0
+2,1,1,0,0,0
+3,0,0,1,0,0
+4,1,0,0,0,0
+5,0,0,0,1,0
+6,0,0,1,0,0
+7,1,0,1,0,0
+8,1,0,0,0,0
+9,0,1,1,0,0
+10,1,0,0,0,0
+11,0,0,1,0,0
+12,1,0,0,0,0
+13,0,1,0,0,0
+14,0,0,0,1,0
+15,1,0,0,0,0
+16,1,1,0,0,0
+17,1,0,0,0,0
+18,1,0,0,0,0
+19,1,0,0,0,0
+20,1,0,0,0,0
+21,1,0,0,0,0
+22,1,0,0,0,0
+23,0,1,0,0,0
+24,1,0,0,0,0
+25,1,0,0,0,0
+26,0,1,0,0,0
+27,1,0,0,0,0
+28,1,0,0,0,0
+29,1,0,0,0,0
+30,0,0,0,0,1
+31,0,0,1,0,0
+32,0,0,1,0,0
+33,0,1,0,0,0
+34,1,0,0,0,0
+35,0,0,0,1,0
+36,0,1,1,0,0
+37,1,0,1,0,0
+38,1,1,0,0,0
+39,1,0,0,0,0
+40,1,0,0,0,0
+41,1,0,0,0,0
+42,1,0,0,0,0
+43,1,0,0,0,0
+44,1,0,0,0,0
+45,0,1,1,0,0
+46,0,0,1,0,0
+47,1,0,0,0,0
+48,1,1,1,0,0
+49,1,0,0,0,0
+50,0,1,0,0,0
+51,1,1,1,0,0
+52,0,0,1,0,0
+53,0,1,0,0,0
+54,1,0,0,0,0
+55,0,0,0,1,1
+56,0,0,0,0,1
+57,1,1,0,0,0
+58,1,0,0,0,0
+59,1,0,0,0,0
+60,1,1,0,0,0
+61,0,1,0,0,0
+62,1,0,0,0,0
+63,1,0,0,1,0
+64,0,0,1,0,0
+65,1,0,1,0,0
+66,1,0,1,0,0
+67,0,1,0,0,0
+68,0,1,0,0,0
+69,0,0,0,0,1
+70,1,0,0,0,0
+71,1,0,0,0,0
+72,1,0,0,0,0
+73,1,0,0,0,0
+74,1,0,0,0,0
+75,1,0,0,0,0
+76,1,0,0,0,0
+77,0,0,0,0,1
+78,0,1,1,0,0
+79,0,0,0,0,1
+80,0,1,0,0,0
+81,0,1,1,0,0
+82,1,0,0,0,0
+83,1,0,0,0,0
+84,0,0,0,0,1
+85,1,0,0,0,0
+86,1,0,0,0,0
+87,1,1,0,0,0
+88,1,0,0,0,0
+89,0,0,0,0,1
+90,0,1,1,0,0
+91,1,0,0,0,0
+92,1,1,0,0,0
+93,0,1,0,0,0
+94,1,0,0,0,0
+95,1,1,1,0,0
+96,0,0,0,0,0
+97,1,1,1,0,0
+98,1,1,0,0,0
+99,1,0,0,0,0
+
+＃04:画像から特徴量を抽出しよう
+
+●openCVとは
+様々な画像処理を行うことができるライブラリです。
+
+●グレースケール画像を作成する方法
+
+import cv2
+
+img = cv2.imread(元画像のパス, cv2.IMREAD_GRAYSCALE)
+cv2.imwrite(グレースケール画像のパス, img)
+
+●ヒストグラムを描画する方法
+
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+
+# ヒストグラムを描画
+def plot_hist(img):
+    img_hist = np.histogram(img.ravel(), 256, [0, 256])
+    hist = img_hist[0]
+    plt.bar(np.arange(256), hist)
+    plt.show()
+
+plot_hist(cv2.imread(ヒストグラムを表示する画像のパス, cv2.IMREAD_GRAYSCALE))
+
+＃05:scikit learnで学習と予測を行おう 
+
+●Pandasとは
+様々な形式のデータの読み書きを行うことができるPythonライブラリです。
+
+●PandasでCSVファイルを読み込む
+
+import pandas as pd
+targets_data = pd.read_csv(CSVファイルのパス)
+
+●グレースケール画像のピクセル値を一次元配列として取得
+
+img = cv2.imread(画像ファイル, cv2.IMREAD_GRAYSCALE)
+data = np.array([img.ravel()])
+
+●scikit learnとは
+簡単に使えるPythonの機械学習ライブラリです。
+http://scikit-learn.org/stable/index.html
+
+●教師データとテストデータへの分割
+
+import sklearn
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+X_train, X_test, y_train, y_test = train_test_split(images_data, targets_data['Kirishima'], random_state=0)
+print(X_train.shape)
+print(X_test.shape)
+print(y_train.shape)
+print(y_test.shape)
+
+●k-NNとは
+k近傍法(k-neareset neighbor algorithm, k-NN)とは、分類問題を解く教師あり機械学習アルゴリズムの1つです。
+テストデータと類似するk個の教師データによる多数決で、分類を行います。
+
+https://ja.wikipedia.org/wiki/K%E8%BF%91%E5%82%8D%E6%B3%95
+
+●k-NNでの学習
+
+knn = KNeighborsClassifier(n_neighbors=1)
+knn.fit(X_train, y_train)
+
+●k-NNで分類する
+
+print(knn.predict(np.array([X_test[0]])))
+print(knn.predict(np.array([X_test[0], X_test[1], X_test[2], X_test[3]])))
+print(knn.predict(knn.predict(X_test)))
+
+y_pred = knn.predict(X_test)
+print(np.mean(y_pred == y_test))
+
+
+＃06:特徴量に明度のヒストグラムを利用しよう 
+
+●画像のヒストグラムを１次元の配列として取得する
+
+img = cv2.imread(画像ファイル, cv2.IMREAD_GRAYSCALE)
+hist = np.histogram(img.ravel(), 256, [0,256])
+
+●教師データとテストデータへの分割
+
+import sklearn
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+# 教師データとテストデータ、教師データの答え、テストデータの答えに分割する
+X_train, X_test, y_train, y_test = train_test_split(images_data, targets_data['Kirishima'], random_state=0)
+
+# 分割結果を確認する
+print(X_train.shape)
+print(X_test.shape)
+print(y_train.shape)
+print(y_test.shape)
+
+●k-NNでの学習
+knn = KNeighborsClassifier(n_neighbors=1)
+knn.fit(X_train, y_train)
+
+●k-NNで分類する
+print(knn.predict(np.array([X_test[0]])))
+print(knn.predict(np.array([X_test[0], X_test[1], X_test[2], X_test[3]])))
+print(knn.predict(knn.predict(X_test)))
+
+y_pred = knn.predict(X_test)
+print(np.mean(y_pred == y_test))
+
